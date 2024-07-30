@@ -1,0 +1,52 @@
+<head>
+    <script>L_PREFER_CANVAS = true;</script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+      <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+    <script src=" https://cdn.jsdelivr.net/npm/leaflet-image@0.4.0/leaflet-image.min.js "></script>
+</head>
+<body>
+    <div style="display: flex; flex-direction: row; gap: 1rem;">
+        <div id='map' style="height: 700px; width: 700px; display: flex;" >My Map</div>
+        <div id='snapshot' style="height: 700px; width: 700px; display: flex;"></div>
+    </div>
+    <button onclick=(snapGenerate())>generate</button>
+    <script src='../../leaflet-image.js'></script>
+    <script>
+        var snapshot = document.getElementById('snapshot');
+        var map = L.map('map').setView([-8.885071663468993, -63.90747070312501], 13);
+        
+        // L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        // }).addTo(map);
+        L.tileLayer('https://geoportal.sedam.ro.gov.br/mosaicos/sentinel/072024/{z}/{x}/{y}.png', {}).addTo(map)
+            
+        var polygon = L.polygon([
+        [-8.8850, -63.9074],
+        [-8.8850, -63.9180],
+        [-8.8880, -63.9180],
+        [-8.8880, -63.9074],
+        ]).addTo(map);
+        
+        function snapGenerate() {
+            leafletImage(map, doImage);
+        }
+        
+        
+        
+        function doImage(err, canvas) {
+            var img = document.createElement('img');
+            var dimensions = map.getSize();
+            img.width = dimensions.x;
+            img.height = dimensions.y;
+            img.src = canvas.toDataURL();
+            snapshot.innerHTML = '';
+            snapshot.appendChild(img);
+        }
+    </script>
+</body>
+</html>

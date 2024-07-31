@@ -8,6 +8,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
     <script src=" https://cdn.jsdelivr.net/npm/leaflet-image@0.4.0/leaflet-image.min.js "></script>
+    
 </head>
 <body>
     <div style="display: flex; flex-direction: row; gap: 1rem;">
@@ -17,9 +18,23 @@
     <button onclick=(snapGenerate())>generate</button>
     <script src='../../leaflet-image.js'></script>
     <script>
+
+        // function runPythonScript() {
+        //     var pythonScriptPath = "/test.py";
+        //     subprocess.run(["python", pythonScriptPath]);
+        // }
         var snapshot = document.getElementById('snapshot');
-        var map = L.map('map').setView([-8.885071663468993, -63.90747070312501], 13);
         
+        
+
+        var map = L.map('map')
+        
+        var polygon = L.polygon([
+        [-8.8850, -63.9074],
+        [-8.8850, -63.9180],
+        [-8.8880, -63.9180],
+        [-8.8880, -63.9074],
+        ]).addTo(map);
         
 
         // L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -27,32 +42,27 @@
         // }).addTo(map);
         L.tileLayer('https://geoportal.sedam.ro.gov.br/mosaicos/sentinel/072024/{z}/{x}/{y}.png', {}).addTo(map)
             
-        var polygon = L.polygon([
-        [-8.8850, -63.9074],
-        [-8.8850, -63.9180],
-        [-8.8880, -63.9180],
-        [-8.8880, -63.9074],
-        ]).addTo(map);
-
-        L.circleMarker([-8.8950, -63.9074]).addTo(map);
         
-        function snapGenerate() {
-            leafletImage(map, doImage);
-            console.log('done')
-        }
+        // map.setView([-8.885071663468993, -63.9077], 17);
+
+        map.fitBounds(polygon.getBounds());
         
-        const pixel = map.latLngToContainerPoint([-8.8850, -63.9074]) 
+            leafletImage(map, function (err, canvas) {
+         
 
-        const pixel2 = map.latLngToContainerPoint([-8.8850, -63.9180]) 
+            const pixel = map.latLngToContainerPoint([-8.8850, -63.9074]) 
 
-        const pixel3 = map.latLngToContainerPoint([-8.8880, -63.9180]) 
+            const pixel2 = map.latLngToContainerPoint([-8.8850, -63.9180]) 
 
-        const pixel4 = map.latLngToContainerPoint([-8.8880, -63.9074]) 
+            const pixel3 = map.latLngToContainerPoint([-8.8880, -63.9180]) 
 
-        console.log(pixel.x)
-        
-        function doImage(err, canvas) {
+            const pixel4 = map.latLngToContainerPoint([-8.8880, -63.9074]) 
+         
             const ctx = canvas.getContext("2d");
+
+            
+            ctx.fillStyle = "rgb(51, 136, 255, 20%)";
+            
 
             ctx.beginPath();
             ctx.moveTo(pixel.x, pixel.y);
@@ -61,6 +71,17 @@
             ctx.lineTo(pixel4.x, pixel4.y);
             ctx.fill();
 
+            ctx.strokeStyle = "rgb(51, 136, 255)";
+
+            ctx.lineWidth = 3
+            ctx.beginPath();
+            ctx.moveTo(pixel.x, pixel.y);
+            ctx.lineTo(pixel2.x, pixel2.y);
+            ctx.lineTo(pixel3.x, pixel3.y);
+            ctx.lineTo(pixel4.x, pixel4.y);
+            ctx.lineTo(pixel.x, pixel.y);
+            ctx.stroke();
+
             var img = document.createElement('img');
             var dimensions = map.getSize();
             img.width = dimensions.x;
@@ -68,7 +89,9 @@
             img.src = canvas.toDataURL();
             snapshot.innerHTML = '';
             snapshot.appendChild(img);
-        }
+        })
+
+        
     </script>
 </body>
 </html>

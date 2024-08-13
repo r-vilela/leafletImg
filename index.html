@@ -18,21 +18,21 @@
     <div style="display: flex; flex-direction: row; gap: 1rem; align-items: center;">
         <button style="display: flex; margin-bottom: auto;" onclick=(snapGenerate())>generate</button>
     </div>
-    <script src='../../leaflet-image.js'></script>
     <script>
 
         var snapshot = document.getElementById('snapshot');
         
         var map = L.map('map')
         
-        var polygon = L.polygon([
-        [-8.8850, -63.9074],
-        [-8.8850, -63.9180],
-        [-8.8880, -63.9180],
-        [-8.8880, -63.9074],
-        ]).addTo(map);
+        // var polygon = L.polygon([
+        // [-8.8850, -63.9074],
+        // [-8.8850, -63.9180],
+        // [-8.8880, -63.9180],
+        // [-8.8880, -63.9074],
+        // ]).addTo(map);
         
-        L.tileLayer('https://geoportal.sedam.ro.gov.br/mosaicos/sentinel/072024/{z}/{x}/{y}.png', {}).addTo(map)
+        L.tileLayer('http://ows.mundialis.de/services/service?', {
+            layers: 'TOPO-OSM-WMS'}).addTo(map)
 
         const map_dic = {
             "2024": "https://geoportal.sedam.ro.gov.br/mosaicos/sentinel/072024/{z}/{x}/{y}.png",
@@ -43,15 +43,18 @@
             "2019": "https://geoportal.sedam.ro.gov.br/mosaicos/sentinel/072019/{z}/{x}/{y}.png",
         }
         
-        // map.setView([-8.885071663468993, -63.9077], 17);
+        map.setView([-8.885071663468993, -63.9077], 7);
 
-        map.fitBounds(polygon.getBounds());
+        var wmsLayer = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+            layers: 'TOPO-OSM-WMS'}).addTo(map);
+
+        // map.fitBounds(wmsLayer.getBounds());
 
         const image = {}
 
         const imgList = []
 
-        const ano = [2019, 2020, 2021, 2022, 2023]
+        const ano = [2023]
         
         L.tileLayer(map_dic[2024], {}).addTo(map)
 
@@ -88,14 +91,14 @@
                     ctx.lineTo(pixel.x, pixel.y);
                     ctx.stroke();
 
-                    // var img = document.createElement('img');
+                    var img = document.createElement('img');
                     var dimensions = map.getSize();
-                    // img.width = dimensions.x;
-                    // img.height = dimensions.y;
-                    // img.src = canvas.toDataURL();
-                    // img.classList.add('img' + ano)
-                    // snapshot.innerHTML = '';
-                    // snapshot.appendChild(img);
+                    img.width = dimensions.x;
+                    img.height = dimensions.y;
+                    img.src = canvas.toDataURL();
+                    img.classList.add('img' + ano)
+                    snapshot.innerHTML = '';
+                    snapshot.appendChild(img);
 
                     const img_list = []
 
@@ -121,7 +124,9 @@
                 var list = await generateImage(ano[year])
                 imgList.push(list)
             }
-            console.log(imgList)
+            var list = await imgList
+            
+            await console.log(list)
             
             for (const x in imgList) {
                 for (const y in imgList[x]){
@@ -137,55 +142,6 @@
         }
 
         waitImage(ano)
-
-        // imagePromise.then(
-        //     () => addImg()
-        // )
-
-        leafletImage(map, function (err, canvas) {
-
-            const pixel = map.latLngToContainerPoint([-8.8850, -63.9074]) 
-
-            const pixel2 = map.latLngToContainerPoint([-8.8850, -63.9180]) 
-
-            const pixel3 = map.latLngToContainerPoint([-8.8880, -63.9180]) 
-
-            const pixel4 = map.latLngToContainerPoint([-8.8880, -63.9074]) 
-        
-            const ctx = canvas.getContext("2d");
-
-            
-            ctx.fillStyle = "rgb(51, 136, 255, 20%)";
-            
-
-            ctx.beginPath();
-            ctx.moveTo(pixel.x, pixel.y);
-            ctx.lineTo(pixel2.x, pixel2.y);
-            ctx.lineTo(pixel3.x, pixel3.y);
-            ctx.lineTo(pixel4.x, pixel4.y);
-            ctx.fill();
-
-            ctx.strokeStyle = "rgb(51, 136, 255)";
-
-            ctx.lineWidth = 3
-            ctx.beginPath();
-            ctx.moveTo(pixel.x, pixel.y);
-            ctx.lineTo(pixel2.x, pixel2.y);
-            ctx.lineTo(pixel3.x, pixel3.y);
-            ctx.lineTo(pixel4.x, pixel4.y);
-            ctx.lineTo(pixel.x, pixel.y);
-            ctx.stroke();
-
-            // var img2 = document.createElement('img');
-            var dimensions = map.getSize();
-            // img2.width = dimensions.x;
-            // img2.height = dimensions.y;
-            // img2.src = canvas.toDataURL();
-            // img2.classList.add('img' + ano)
-            // snapshot.innerHTML = '';
-            // snapshot.appendChild(img2);
-            
-        })
                
         function addImg(list) {
             var img = document.createElement('img');
@@ -195,17 +151,7 @@
             snapshot.innerHTML = '';
             snapshot.appendChild(img);
         }
-        
-        // var img = document.createElement('img');
-        // img.width = image.width
-        // img.height = image.heigth
-        // img.src = image.src
-        // // img.classList.add('img' + ano)
-        // snapshot.innerHTML = '';
-        // snapshot.appendChild(img);
-
-        // }
-            
+                    
     </script>
 </body>
 </html>
